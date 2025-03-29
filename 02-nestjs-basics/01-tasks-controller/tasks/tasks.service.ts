@@ -1,17 +1,53 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { Task } from "./task.model";
+import { ITask } from "./task.model";
 
 @Injectable()
 export class TasksService {
-  private tasks: Task[] = [];
+  private tasks: ITask[] = [];
+  private autoIncrementIndex: number = 0;
 
-  getAllTasks(): Task[] {}
+  private getTaskIndex(id: ITask['id']):number {
+    const index = this.tasks.findIndex((task) => task.id === id);
 
-  getTaskById(id: string): Task {}
+    if (index === -1) {
+      throw new NotFoundException(`Task with id ${id} not found`);
+    }
 
-  createTask(task: Task): Task {}
+    return index;
+  }
 
-  updateTask(id: string, update: Task): Task {}
+  getAllTasks(): ITask[] {
+    return this.tasks;
+  }
 
-  deleteTask(id: string): Task {}
+  getTaskById(id: ITask['id']): ITask {
+    const index = this.getTaskIndex(id)
+
+    return this.tasks[index];
+  }
+
+  createTask(inTask: Omit<ITask, 'id'>): ITask {
+    const task: ITask = inTask
+    task.id = String(this.autoIncrementIndex++);
+    this.tasks.push(task);
+
+    return task;
+  }
+
+  updateTask(id: ITask['id'], update: ITask): ITask {
+    const index = this.getTaskIndex(id)
+
+    this.tasks[index] = update;
+
+    return update;
+  }
+
+  deleteTask(id: ITask['id']): ITask {
+    const index= this.getTaskIndex(id)
+    const taskToDelete = this.tasks[index]
+
+    this.tasks.splice(index, 1);
+
+    return taskToDelete
+  }
 }
