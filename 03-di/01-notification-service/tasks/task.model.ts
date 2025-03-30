@@ -7,6 +7,10 @@ export enum TaskStatus {
   Completed = "completed",
 }
 
+export enum TaskTypes {
+  newTask = "Новая задача",
+}
+
 export class Task {
   @IsString()
   @IsNotEmpty()
