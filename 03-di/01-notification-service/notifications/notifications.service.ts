@@ -28,8 +28,11 @@ export class NotificationsService {
     });
   }
 
-  sendEmail(email: EmailNotification['email'], taskType: EmailNotification['taskType'], message: EmailNotification['message']): void {
-
+  sendEmail(
+    email: EmailNotification["email"],
+    taskType: EmailNotification["taskType"],
+    message: EmailNotification["message"],
+  ): void {
     this.log({
       type: NotificationType.email,
       message: `${taskType} ${message}`,
