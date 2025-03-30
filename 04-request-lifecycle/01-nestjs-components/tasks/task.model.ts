@@ -7,14 +7,10 @@ export enum TaskStatus {
   Completed = "completed",
 }
 
-export enum TaskTypes {
-  newTask = "Новая задача",
-}
-
 export class Task {
-  @IsString()
+  @IsNumber()
   @IsNotEmpty()
-  id: string;
+  id: number;
 
   @IsString()
   @IsNotEmpty()
@@ -32,11 +28,9 @@ export class Task {
   assignedTo?: number;
 }
 
-export class CreateTaskDto extends PickType(Task, [
-  "title",
-  "description",
-  "assignedTo",
-]) {}
+export class CreateTaskDto extends PartialType(
+  PickType(Task, ["title", "description", "status"] as const),
+) {}
 export class UpdateTaskDto extends PartialType(
   PickType(Task, ["title", "description", "status"] as const),
 ) {}

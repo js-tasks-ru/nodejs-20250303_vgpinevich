@@ -28,7 +28,6 @@ export class TasksService {
   }: UpdateTaskDto): string {
     return `Статус задачи "${title}" обновлён на "${status}"`;
   }
-
   async createTask(createTaskDto: CreateTaskDto) {
     const { title, description, assignedTo } = createTaskDto;
     const task: Task = {
