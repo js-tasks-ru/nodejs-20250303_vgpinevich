@@ -34,12 +34,13 @@ export class TasksService {
     return task;
   }
 
-  updateTask(id: ITask['id'], update: ITask): ITask {
+  updateTask(id: ITask['id'], taskToUpdate: ITask): ITask {
     const index = this.getTaskIndex(id)
+    taskToUpdate.id = id
 
-    this.tasks[index] = update;
+    this.tasks[index] = taskToUpdate;
 
-    return update;
+    return taskToUpdate;
   }
 
   deleteTask(id: ITask['id']): ITask {
