@@ -28,13 +28,11 @@ export class TasksService {
 
     const skip = (inPage - 1) * limit;
 
-    const [tasks] = await this.taskRepository.findAndCount({
+    return this.taskRepository.find({
       order: { id: "ASC" },
       skip,
       take: limit,
     });
-
-    return tasks;
   }
 
   async findOne(id: number) {
