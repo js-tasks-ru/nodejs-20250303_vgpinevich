@@ -10,14 +10,16 @@ import {
   Query,
 } from "@nestjs/common";
 import { TasksService } from "./tasks.service";
-import { CreateTask, UpdateTask, TaskId } from "./task.model";
+import {  TaskId } from "./task.model";
+import { UpdateTaskDto } from "./dto/update-task.dto";
+import { CreateTaskDto } from "./dto/create-task.dto";
 
 @Controller("tasks")
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
   @Post()
-  create(@Body() inTask: CreateTask) {
+  create(@Body() inTask: CreateTaskDto) {
     return this.tasksService.create(inTask);
   }
 
@@ -35,7 +37,7 @@ export class TasksController {
   }
 
   @Patch(":id")
-  update(@Param("id", ParseIntPipe) id: TaskId, @Body() inTask: UpdateTask) {
+  update(@Param("id", ParseIntPipe) id: TaskId, @Body() inTask: UpdateTaskDto) {
     return this.tasksService.update(id, inTask);
   }
 
