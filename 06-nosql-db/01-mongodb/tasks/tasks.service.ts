@@ -34,7 +34,7 @@ export class TasksService {
     const updatedTask = await this.TaskModel.findByIdAndUpdate(
       id,
       inTask,
-      { new: true }, // Return the modified document
+      { new: true },
     );
 
     if (!updatedTask) {
