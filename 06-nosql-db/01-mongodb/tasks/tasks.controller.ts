@@ -12,14 +12,13 @@ import { CreateTaskDto } from "./dto/create-task.dto";
 import { UpdateTaskDto } from "./dto/update-task.dto";
 import { ObjectId } from "mongoose";
 import { ObjectIDPipe } from "../objectid/objectid.pipe";
-import { CreateTask, UpdateTask } from "./task.model";
 
 @Controller("tasks")
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
   @Post()
-  create(@Body() createTaskDto: CreateTask) {
+  create(@Body() createTaskDto: CreateTaskDto) {
     return this.tasksService.create(createTaskDto);
   }
 
@@ -36,7 +35,7 @@ export class TasksController {
   @Patch(":id")
   update(
     @Param("id", ObjectIDPipe) id: ObjectId,
-    @Body() updateTaskDto: UpdateTask,
+    @Body() updateTaskDto: UpdateTaskDto,
   ) {
     return this.tasksService.update(id, updateTaskDto);
   }
