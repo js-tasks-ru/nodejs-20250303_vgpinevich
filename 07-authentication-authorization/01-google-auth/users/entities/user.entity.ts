@@ -5,9 +5,15 @@ export class User {
   @PrimaryColumn()
   id: string;
 
-  @Column()
+  @Column({ nullable: true })
+  email: string;
+
+  @Column({ nullable: true })
   displayName: string;
 
-  @Column()
+  @Column({ nullable: true })
   avatar: string;
+
+  @Column({ nullable: true })
+  password: string;
 }
