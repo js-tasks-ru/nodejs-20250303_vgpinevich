@@ -7,7 +7,6 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { JwtStrategy } from "./passport/jwt.stategy";
 import { GoogleStrategy } from "./passport/google.strategy";
 import { JwtModule } from "@nestjs/jwt";
-import { MOCK_JWT_KEY } from "../constants";
 
 @Module({
   imports: [
@@ -18,7 +17,7 @@ import { MOCK_JWT_KEY } from "../constants";
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>("JWT_SECRET") || MOCK_JWT_KEY,
+        secret: configService.get<string>("JWT_SECRET"),
         signOptions: { expiresIn: "1h" },
         global: true,
       }),
