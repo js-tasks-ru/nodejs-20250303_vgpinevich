@@ -8,6 +8,7 @@ import { GoogleStrategy } from "../auth/passport/google.strategy";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { User } from "../users/entities/user.entity";
 import { Profile } from "passport-google-oauth20";
+import { ConfigService } from "@nestjs/config";
 
 // Mock user data that simulates Google's response
 const mockGoogleProfile = {
@@ -18,6 +19,23 @@ const mockGoogleProfile = {
   _raw: "",
   _json: {},
 } as Profile;
+
+const mockConfigService = {
+  get: jest.fn((key: string) => {
+    switch (key) {
+      case "GOOGLE_CLIENT_ID":
+        return "mock-google-client-id";
+      case "GOOGLE_CLIENT_SECRET":
+        return "mock-google-client-secret";
+      case "GOOGLE_CALLBACK_URL":
+        return "http://localhost:3000/auth/google/callback";
+      case "JWT_SECRET":
+        return "killer-is-jim";
+      default:
+        return null;
+    }
+  }),
+};
 
 // override authenticate method to avoid requests to google
 class MockGoogleStrategy extends GoogleStrategy {
@@ -52,6 +70,8 @@ describe("Authentication (e2e)", () => {
         AppModule,
       ],
     })
+      .overrideProvider(ConfigService)
+      .useValue(mockConfigService)
       .overrideProvider(GoogleStrategy)
       .useClass(MockGoogleStrategy)
       .compile();
