@@ -1,5 +1,5 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { INestApplication } from "@nestjs/common";
+import { INestApplication, ValidationPipe } from "@nestjs/common";
 import * as request from "supertest";
 import { AppModule } from "../../app.module";
 import { getRepositoryToken } from "@nestjs/typeorm";
@@ -10,35 +10,103 @@ describe("TasksController (e2e)", () => {
   let app: INestApplication;
   let repository: Repository<Task>;
 
-  beforeAll(async () => {});
+  const testTask = {
+    title: "Test Task",
+    description: "Test Description",
+    isCompleted: false,
+  };
 
-  afterAll(async () => {});
+  beforeAll(async () => {
+    const moduleFixture: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile();
 
-  beforeEach(async () => {});
+    app = moduleFixture.createNestApplication();
+    app.useGlobalPipes(
+      new ValidationPipe({
+        transform: true,
+        whitelist: true,
+        forbidNonWhitelisted: true,
+      }),
+    );
+    await app.init();
+
+    repository = moduleFixture.get<Repository<Task>>(getRepositoryToken(Task));
+  });
+
+  afterAll(async () => await app.close());
+  beforeEach(async () => await repository.delete({}));
+
+  describe("POST /tasks", () => {
+    it("should create a task (201)", async () => {
+      const validPayload = {
+        title: "Valid Title",
+        description: "Valid Description with minimum 1 character",
+      };
+
+      const { body } = await request(app.getHttpServer())
+        .post("/tasks")
+        .send(validPayload)
+        .expect(201);
+
+      expect(body).toMatchObject(validPayload);
+    });
+
+    it("should reject invalid data (400)", async () => {
+      await request(app.getHttpServer())
+        .post("/tasks")
+        .send({ title: 123, description: true })
+        .expect(400);
+    });
+  });
 
   describe("GET /tasks", () => {
-    it("should return all tasks", async () => {});
+    it("should return all tasks (200)", async () => {
+      await repository.save([testTask, testTask]);
+      const { body } = await request(app.getHttpServer())
+        .get("/tasks")
+        .expect(200);
+      expect(body).toHaveLength(2);
+    });
   });
 
   describe("GET /tasks/:id", () => {
-    it("should return task by id", async () => {});
+    it("should return task (200)", async () => {
+      const task = await repository.save(testTask);
+      const { body } = await request(app.getHttpServer())
+        .get(`/tasks/${task.id}`)
+        .expect(200);
 
-    it("should return 404 if task not found", async () => {});
-  });
+      expect(body).toMatchObject(testTask);
+    });
 
-  describe("POST /tasks", () => {
-    it("should create a new task", async () => {});
+    it("should return 404", async () => {
+      await request(app.getHttpServer()).get("/tasks/999").expect(404);
+    });
   });
 
   describe("PATCH /tasks/:id", () => {
-    it("should update an existing task", async () => {});
+    it("should update task (200)", async () => {
+      const task = await repository.save(testTask);
+      const update = { title: "Updated", isCompleted: true };
 
-    it("should return 404 when updating non-existent task", async () => {});
+      const { body } = await request(app.getHttpServer())
+        .patch(`/tasks/${task.id}`)
+        .send(update)
+        .expect(200);
+
+      expect(body).toMatchObject(update);
+    });
   });
 
   describe("DELETE /tasks/:id", () => {
-    it("should delete an existing task", async () => {});
+    it("should delete task (200)", async () => {
+      const task = await repository.save(testTask);
+      await request(app.getHttpServer())
+        .delete(`/tasks/${task.id}`)
+        .expect(200);
 
-    it("should return 404 when deleting non-existent task", async () => {});
+      expect(await repository.findOneBy({ id: task.id })).toBeNull();
+    });
   });
 });

@@ -5,5 +5,5 @@ import { IsBoolean, IsOptional } from "class-validator";
 export class UpdateTaskDto extends PartialType(CreateTaskDto) {
   @IsBoolean()
   @IsOptional()
-  isCompleted: boolean;
+  isCompleted?: boolean;
 }
